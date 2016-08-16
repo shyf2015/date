@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日历</title>
+<style>
+    *{padding:0;margin:0;border:0;}
+    .box{
+        position:relative;
+        width:420px;
+        height:460px;
+        border:1px solid #444;
+    }
+    .top{
+        position:absolute;
+        top:0;
+        left:0;
+        width:420px;
+        height:49px;
+        border-bottom:1px solid #888;
+        background-color: #2c4;
+    }
+    .top p{
+        position: absolute;
+        left: 100px;
+        width: 220px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        font-size: 30px;
+    }
+    .top .left{
+        position: absolute;
+        top:0;
+        left:30px;
+        width:50px;
+        height:50px;
+        text-align: center;
+        line-height: 50px;
+        color:#555;
+        cursor:pointer;
+    }
+    .top .right{
+        position: absolute;
+        top:0;
+        right:30px;
+        width:50px;
+        height:50px;
+        text-align: center;
+        line-height: 50px;
+        color:#555;
+        cursor:pointer;
+    }
+    .week{
+        position:absolute;
+        width:420px;
+        height:49px;
+        border-bottom:1px solid #444;
+        top:50px;
+        left:0;
+    }
+    .week ul li{
+        list-style: none;
+        float:left;
+        width:60px;
+        height:50px;
+        text-align: center;
+        line-height: 50px;
+        background-color: #8c7;
+    }
+    .day{
+        position: absolute;
+        top: 100px;
+        left: 0;
+    }
+    .day ul li{
+        list-style: none;
+        width: 58px;
+        height: 58px;
+        border:1px solid #fff;
+        float:left;
+        text-align: center;
+        line-height: 60px;
+        font-size: 20px;
+        background-color: #bbb;
+    }
+    .day ul li.type{
+        background-color:#666;
+    }
+</style>
+</head>
+<body>
+    <div class="box">
+        <div class="top">
+            <p></p>
+            <span class="left"><b>上一月</b></span>
+            <span class="right"><b>下一月</b></span>
+        </div>
+        <div class="week">
+            <ul>
+                <li>日</li>
+                <li>一</li>
+                <li>二</li>
+                <li>三</li>
+                <li>四</li>
+                <li>五</li>
+                <li>六</li>
+            </ul>
+        </div>
+        <div class="day">
+            <ul id="ul"></ul>
+        </div>
+    </div>
+<script src="http://apps.bdimg.com/libs/jquery/1.9.1/jquery.js"></script>
+<script>
+    var count;
+    var date=new Date();
+    var year=date.getFullYear();
+    var month=date.getMonth()+1;
+    var data=date.getDate();
+    var day=date.getDay();
+
+    var b;
+    switch(day){
+        case 0:b=0;break;
+        case 1:b=1;break;
+        case 2:b=2;break;
+        case 3:b=3;break;
+        case 4:b=4;break;
+        case 5:b=5;break;
+        case 6:b=6;break;
+    }
+    var ul=document.getElementById('ul');
+    for(var n=0;n<42;n++){
+        var li=document.createElement("li");
+        li.innerHTML="";
+        if(n>=b){
+            li.innerHTML=n-b+1;
+        }
+        var l=31;
+        if(month==4||month==6||month==9||month==11){l=30;}
+        if(month==2){
+            if((year%100==0 && year%400==0) || year%4==0){
+                l=28;
+            }
+            else{l=29;}
+        }
+        if(n>l+1){
+            li.innerHTML="";
+        }
+        ul.appendChild(li);
+    }
+
+    function act(){
+        //var day=date.getDay();
+        var top=document.getElementsByTagName('p');
+        top[0].innerHTML=year+"年"+month+"月";
+        //alert($(".day ul li").eq(5).html());
+        //alert(data);
+        for(var i=0;i<42;i++){
+            var d=$(".day ul li").eq(i).html();
+            if(d==data){
+                $(".day ul li").eq(i).addClass('type');
+            }
+        }
+    }
+
+    var month2=month;
+    var year2=year;
+    $(".top .right").on("click",function(){
+        count=0;
+        month2=month2+1;
+        if(month2>12){
+            month2=1;
+            year2=year2+1;
+        }
+       
+        $('p').eq(0).html(year2+"年"+month2+"月");
+        for(var i=25;i<42;i++){
+            if($(".day ul li").eq(i).html()==""){
+                count=42-i;
+                break;
+            }
+        }
+        var k=0;
+        for(var j=0;j<42;j++){
+            $(".day ul li").eq(j).html("");
+            if(count>7){count=count-7;}
+            if(count==0){
+                count=7;
+            }
+            if(j>=(7-count)){
+                $(".day ul li").eq(j).html(j+count-6);
+                k++;
+                var l=31;
+                if(month2==4||month2==6||month2==9||month2==11){l=30;}
+                if(month2==2){
+                    if((year2%100==0 && year2%400==0) || year2%4==0){
+                        l=29;
+                    }
+                    else{l=28;}
+                }
+                if(k>l){
+                    for(;j<42;j++){
+                        $('.day ul li').eq(j).html("");
+                    }
+                }
+            }
+            if(k>l){
+                //alert(l);
+                break;
+            }
+        }
+         if(month2==month && year2==year){
+            for(var i=0;i<42;i++){
+                var d=$(".day ul li").eq(i).html();
+                if(d==data){
+                    $(".day ul li").eq(i).addClass('type').siblings().removeClass('type');
+                }
+            }
+        }else{
+            $('.day ul li').removeClass('type');
+        }
+    })
+
+    //var month0=month2;
+    //var year0=year2;
+    $('.top .left').on("click",function(){
+        month2=month2-1;
+        if(month2<1){
+            month2=12;
+            year2=year2-1;
+        }
+       
+        $('p').eq(0).html(year2+"年"+month2+"月");
+        count=0;
+        for(var i=0;i<14;i++){
+            if($(".day ul li").eq(i).html()==""){
+                count++;
+                if(count>7){count=count-7;}
+            }
+        }
+        count=7-count;
+
+        var l=31;
+        if(month2==4||month2==6||month2==9||month2==11){l=30;}
+        if(month2==2){
+            if((year2%100==0 && year2%400==0) || year2%4==0){
+                l=29;
+            }
+            else{l=28;}
+        }
+
+        var p=0;
+        for(var i=41,j=1;i>=0;i--,j++){
+            $(".day ul li").eq(i).html("");
+            if(j>count){
+                $(".day ul li").eq(i).html(l-p);
+                p++;
+            }
+            if(l-p<0){
+                $(".day ul li").eq(i).html("");
+            }
+        }
+         if(month2==month && year2==year){
+            for(var i=0;i<42;i++){
+                var d=$(".day ul li").eq(i).html();
+                if(d==data){
+                    $(".day ul li").eq(i).addClass('type').siblings().removeClass('type');
+                }
+            }
+        }else{
+            $('.day ul li').removeClass('type');
+        }
+    })
+    window.act();
+</script>
+</body>
+</html>
